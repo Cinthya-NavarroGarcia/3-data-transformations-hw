@@ -8,7 +8,7 @@
 #Load packages
 library(tidyverse)
 ds <- read_csv("data_raw/rolling_stone_500.csv")
-
+ds
 ### Question 1 ---------- 
 
 #Use a function to check the class of all of the variables in 'ds' 
@@ -16,7 +16,10 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 #Use a function to check that your conversion succeeded
 
 #ANSWER
-
+glimpse(ds)
+#numeric and character
+ds$Year <- as.numeric(ds$Year)
+is.numeric(ds$Year)
 
 ### Question 2 ---------- 
 
@@ -25,14 +28,18 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+ds %>% rename_with(tolower)
 
 ### Question 3 ----------
 
 # Use mutate to create a new variable in ds that has the decade of the year as a number
 # For example, 1971 would become 1970, 2001 would become 2000
 # Hint: read the documentation for ?floor and make sure year is numeric (from Question 1)
+?floor
 
 #ANSWER
+ds <- ds %>%
+  mutate(Year = round(Year, digits = -1))
 
 
 ### Question 4 ----------
@@ -40,6 +47,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Sort the dataset by rank so that 1 is at the top
 
 #ANSWER
+ds %>% arrange(Rank)
 
 
 ### Question 5 ----------
@@ -48,7 +56,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # That just has the artists and songs for the top 10 songs
 
 #ANSWER
-
+top10 <- ds %>% 
+  filter(Rank <= 10) %>%
+  select(Song, Artist)
 
 
 ### Question 6 ----------

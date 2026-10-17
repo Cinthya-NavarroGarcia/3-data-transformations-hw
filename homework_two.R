@@ -1,0 +1,160 @@
+#PSYC 259 Homework 3 - Data Transformation
+#For full credit, provide answers for at least 7/11
+
+#List names of students collaborating with: 
+
+### SETUP: RUN THIS BEFORE STARTING ----------
+
+#Load packages
+library(tidyverse)
+ds <- read_csv("data_raw/rolling_stone_500.csv")
+ds
+### Question 1 ---------- 
+
+#Use a function to check the class of all of the variables in 'ds' 
+#Convert "Year" to a numeric, saving it back to 'ds'
+#Use a function to check that your conversion succeeded
+
+#ANSWER
+glimpse(ds)
+#numeric and character
+ds$Year <- as.numeric(ds$Year)
+is.numeric(ds$Year)
+
+### Question 2 ---------- 
+
+# Using a dplyr function,
+# change ds so that all of the variables are lowercase
+
+#ANSWER
+
+ds %>% rename_with(tolower)
+
+### Question 3 ----------
+
+# Use mutate to create a new variable in ds that has the decade of the year as a number
+# For example, 1971 would become 1970, 2001 would become 2000
+# Hint: read the documentation for ?floor and make sure year is numeric (from Question 1)
+?floor
+
+#ANSWER
+ds <- ds %>%
+  mutate(Year = round(Year, digits = -1))
+
+
+### Question 4 ----------
+
+# Sort the dataset by rank so that 1 is at the top
+
+#ANSWER
+ds %>% arrange(Rank)
+
+### Question 5 ----------
+
+# Use filter and select to create a new tibble called 'top10'
+# That just has the artists and songs for the top 10 songs
+
+#ANSWER
+top10 <- ds %>% 
+  filter(Rank <= 10) %>%
+  select(Song, Artist)
+
+
+### Question 6 ----------
+
+# Use summarize to find the earliest, most recent, and average release year
+# and save the results to a new tibble called "ds_sum"
+# Hint, the function drop_na() might help. Read ?drop_na
+
+#ANSWER
+?summarise
+?drop_na
+
+ds_sum <- ds %>% 
+  summarize(
+    min_Year = min(Year, na.rm= T),
+    m_Year = mean(Year, na.rm = T),
+    max_Year = max(Year, na.rm = T))
+
+
+#1880, 1980 ,2020
+
+### Question 7 ----------
+
+# Use filter on the original dataset 'ds' to find all of the artists/song titles from 
+# the min/max/mean years that you identified in 'ds_sum'
+# Use one filter command only, and sort the responses by year
+# Bonus: find a way to do it without hard coding the years (i.e. pull them from ds_sum)
+# (this might take some searching to find functions that will help)
+
+#ANSWER
+
+
+ds <- ds %>%
+  select(Song, Artist, Year) %>% 
+  filter(Year %in% c(ds_sum$min_Year, ds_sum$m_Year, ds_sum$max_Year)) %>% 
+  arrange(Year)
+
+
+### Question 8 ---------- 
+
+# There's an error here. The oldest song "Brass in Pocket"
+# is from 1979! Use mutate and ifelse to fix the error in 'ds'
+# then recalculate decade, and then
+# recalculate the responses from Questions 6-7 to
+# find the correct oldest, averag-ist, and most recent songs
+
+#ANSWER
+
+ds <- ds %>%
+  mutate(Year = ifelse(Year == 1880, 1979, Year))
+
+ds <- ds %>%
+  mutate(Year = round(Year, digits = -1))
+
+ds_sum <- ds %>% 
+  summarize(
+    min_Year = min(Year, na.rm= T),
+    m_Year = mean(Year, na.rm = T),
+    max_Year = max(Year, na.rm = T))
+
+#1980, 2018, 2020
+
+ds <- ds %>%
+  select(Song, Artist, Year) %>% 
+  filter(Year %in% c(ds_sum$min_Year, ds_sum$m_Year, ds_sum$max_Year)) %>% 
+  arrange(Year)
+
+### Question 9 ---------
+
+# Use group_by and summarize to find the average rank and 
+# number of songs on the list by decade. To make things easier
+# filter out the NA values from decade before summarizing
+# You don't need to save the results anywhere
+# Use the pipe %>% to string the commands together
+
+#ANSWER
+#not sure if this is correct
+ds %>% 
+  group_by(Year) %>% 
+  summarise(
+    m_Rank = mean(Rank, na.rm = T),
+    n = n())
+
+
+
+### Question 10 --------
+
+# Look up the dplyr "count" function
+# Use it to count up the number of songs by decade
+# Then use slice_max() to pull the row with the most songs
+# Use the pipe %>% to string the commands together
+# Check against your answers from Question 9 to make sure it matches
+
+#ANSWER
+
+
+### Question 11 ------
+# Use RStudio's styler to style all the code in your homework
+#install.packages("styler")
+library(styler)
